@@ -107,7 +107,12 @@ if (isset($json['queries']) && is_array($json['queries']))
       {
         $results[$offset] = $returned_json[0];
       } else {
-        var_dump($returned_json, $response);
+        $results[$offset] = Array(
+          "metric" => $query['metric'],
+          "tags" => $query['tags'],
+          "aggregatedTags" => Array(),
+          "dps" => Array(),
+        );
       }
     } else {
       $results[$offset] = Array(
