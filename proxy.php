@@ -132,6 +132,15 @@ if (isset($json['queries']) && is_array($json['queries']))
       curl_close($ch);
       break;
     }
+    if ($x == 4)
+    {
+      $results[$offset] = Array(
+        "metric" => $query['metric'],
+        "tags" => $query['tags'],
+        "aggregatedTags" => Array(),
+        "dps" => Array(),
+      );
+    }
   }
 }
 
