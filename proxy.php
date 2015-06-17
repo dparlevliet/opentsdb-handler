@@ -132,6 +132,8 @@ if (isset($json['queries']) && is_array($json['queries']))
       curl_close($ch);
       break;
     }
+
+    // we experienced too many timeout retries
     if ($x == 4)
     {
       $results[$offset] = Array(
