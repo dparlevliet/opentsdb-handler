@@ -120,6 +120,7 @@ if (isset($json['queries']) && is_array($json['queries']))
             "tags" => $query['tags'],
             "aggregatedTags" => Array(),
             "dps" => Array(),
+            "not_found" => true,
           );
         }
       } else {
@@ -128,6 +129,7 @@ if (isset($json['queries']) && is_array($json['queries']))
           "tags" => $query['tags'],
           "aggregatedTags" => Array(),
           "dps" => Array(),
+          "error" => true,
         );
       }
       curl_close($ch);
@@ -142,6 +144,7 @@ if (isset($json['queries']) && is_array($json['queries']))
         "tags" => $query['tags'],
         "aggregatedTags" => Array(),
         "dps" => Array(),
+        "timeout" => true,
       );
     }
   }
