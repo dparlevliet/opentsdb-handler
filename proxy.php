@@ -103,7 +103,7 @@ if (isset($json['queries']) && is_array($json['queries']))
 
     if ($response_code == 200) {
       $returned_json = json_decode(trim($body, '"'), true);
-      if (isset($returned_json[0]))
+      if (sizeof($returned_json)>0)
       {
         $results[$offset] = $returned_json[0];
       } else {
