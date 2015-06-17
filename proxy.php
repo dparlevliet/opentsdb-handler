@@ -29,14 +29,29 @@ set_time_limit(600);
 define('OPENTSDB_HOST', '127.0.0.1');
 define('OPENTSDB_PORT', 4242);
 
-header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
-header('Access-Control-Allow-Credentials: true');
+if (!function_exists('getallheaders')) 
+{
+  function getallheaders()
+  {
+     $headers = '';
+     foreach ($_SERVER as $name => $value)
+     {
+       if (substr($name, 0, 5) == 'HTTP_')
+       {
+         $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+       }
+     }
+     return $headers;
+  }
+}
 
 $json = file_get_contents('php://input');
 if (sizeof($json) == 0)
 {
   // check if this is an OPTIONS request
   if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+    header('Access-Control-Allow-Credentials: true');
     if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
       header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 
