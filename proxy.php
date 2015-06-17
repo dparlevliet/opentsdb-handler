@@ -107,7 +107,7 @@ if (isset($json['queries']) && is_array($json['queries']))
       {
         $results[$offset] = $returned_json[0];
       } else {
-        var_dump($returned_json);
+        var_dump($returned_json, $response);
       }
     } else {
       $results[$offset] = Array(
