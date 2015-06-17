@@ -77,14 +77,15 @@ if (isset($json['queries']) && is_array($json['queries']))
     $new_json['queries'] = Array($query);
     $new_json = json_encode($new_json);
 
-    for ($x=0; $x<5; $x++)
+    $max_retries = 2;
+    for ($x=1; $x<=$max_retries; $x++)
     {
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
       curl_setopt($ch, CURLOPT_URL, 'http://'.OPENTSDB_HOST.':'.OPENTSDB_PORT.'/api/query');
       curl_setopt($ch, CURLOPT_POSTFIELDS, $new_json);
       curl_setopt($ch, CURLOPT_HEADER, 1);
-      curl_setopt($ch, CURLOPT_TIMEOUT, 5); //timeout in seconds
+      curl_setopt($ch, CURLOPT_TIMEOUT, 1); //timeout in seconds
 
       foreach ($headers as $key=>$header)
       {
@@ -134,7 +135,7 @@ if (isset($json['queries']) && is_array($json['queries']))
     }
 
     // we experienced too many timeout retries
-    if ($x == 4)
+    if ($x == $max_retries)
     {
       $results[$offset] = Array(
         "metric" => $query['metric'],
