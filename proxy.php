@@ -78,6 +78,7 @@ if (isset($json['queries']) && is_array($json['queries']))
     $new_json = json_encode($new_json);
 
     $max_retries = 2;
+    $complete = false;
     for ($x=1; $x<=$max_retries; $x++)
     {
       $ch = curl_init();
@@ -133,11 +134,11 @@ if (isset($json['queries']) && is_array($json['queries']))
         );
       }
       curl_close($ch);
-      break;
+      $complete = true;
     }
 
     // we experienced too many timeout retries
-    if ($x == $max_retries)
+    if (!$complete)
     {
       $results[$offset] = Array(
         "metric" => $query['metric'],
