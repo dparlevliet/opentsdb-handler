@@ -77,35 +77,45 @@ if (isset($json['queries']) && is_array($json['queries']))
     $new_json['queries'] = Array($query);
     $new_json = json_encode($new_json);
 
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-    curl_setopt($ch, CURLOPT_URL, 'http://'.OPENTSDB_HOST.':'.OPENTSDB_PORT.'/api/query');
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $new_json);
-    curl_setopt($ch, CURLOPT_HEADER, 1);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30); //timeout in seconds
-
-    foreach ($headers as $key=>$header)
+    for ($x=0; $x<5; $x++)
     {
-      if (stristr('content-length', $header) !== false)
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+      curl_setopt($ch, CURLOPT_URL, 'http://'.OPENTSDB_HOST.':'.OPENTSDB_PORT.'/api/query');
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $new_json);
+      curl_setopt($ch, CURLOPT_HEADER, 1);
+      curl_setopt($ch, CURLOPT_TIMEOUT, 5); //timeout in seconds
+
+      foreach ($headers as $key=>$header)
       {
-        $headers[$key] = 'Content-Length: ' . strlen($new_json);
+        if (stristr('content-length', $header) !== false)
+        {
+          $headers[$key] = 'Content-Length: ' . strlen($new_json);
+        }
       }
-    }
 
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-    $response       = curl_exec($ch);
-    $header_size    = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-    $header         = substr($response, 0, $header_size);
-    $body           = substr($response, $header_size);
-    $response_code  = curl_getinfo($ch,CURLINFO_HTTP_CODE);
+      $response       = curl_exec($ch);
+      $header_size    = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+      $header         = substr($response, 0, $header_size);
+      $body           = substr($response, $header_size);
+      $response_code  = curl_getinfo($ch,CURLINFO_HTTP_CODE);
 
-    if ($response_code == 200) {
-      $returned_json = json_decode(trim($body, '"'), true);
-      if (sizeof($returned_json)>0)
-      {
-        $results[$offset] = $returned_json[0];
+      if ($response_code == 200) {
+        $returned_json = json_decode(trim($body, '"'), true);
+        if (sizeof($returned_json)>0)
+        {
+          $results[$offset] = $returned_json[0];
+        } else {
+          $results[$offset] = Array(
+            "metric" => $query['metric'],
+            "tags" => $query['tags'],
+            "aggregatedTags" => Array(),
+            "dps" => Array(),
+          );
+        }
       } else {
         $results[$offset] = Array(
           "metric" => $query['metric'],
@@ -114,16 +124,9 @@ if (isset($json['queries']) && is_array($json['queries']))
           "dps" => Array(),
         );
       }
-    } else {
-      $results[$offset] = Array(
-        "metric" => $query['metric'],
-        "tags" => $query['tags'],
-        "aggregatedTags" => Array(),
-        "dps" => Array(),
-      );
+      curl_close($ch);
+      break;
     }
-
-    curl_close($ch);
   }
 }
 
