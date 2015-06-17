@@ -85,7 +85,7 @@ if (isset($json['queries']) && is_array($json['queries']))
       curl_setopt($ch, CURLOPT_URL, 'http://'.OPENTSDB_HOST.':'.OPENTSDB_PORT.'/api/query');
       curl_setopt($ch, CURLOPT_POSTFIELDS, $new_json);
       curl_setopt($ch, CURLOPT_HEADER, 1);
-      curl_setopt($ch, CURLOPT_TIMEOUT, 1); //timeout in seconds
+      curl_setopt($ch, CURLOPT_TIMEOUT, 2); //timeout in seconds
 
       foreach ($headers as $key=>$header)
       {
