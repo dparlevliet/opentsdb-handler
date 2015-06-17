@@ -98,6 +98,11 @@ if (isset($json['queries']) && is_array($json['queries']))
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
       $response       = curl_exec($ch);
+      if (curl_errno($ch))
+      {
+        continue;
+      }
+
       $header_size    = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
       $header         = substr($response, 0, $header_size);
       $body           = substr($response, $header_size);
