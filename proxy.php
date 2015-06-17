@@ -18,21 +18,30 @@
  * I do not want to patch OpenTSDB because I don't want the headache of
  * maintaining a patched version right now so this will do in the interrum and if it
  * is not fixed in a few months then I may seek a better alternative.
+ *
+ * If you can avoid using this, do so.
  */
 
 error_reporting(E_ALL);
 ini_set('display_errors', 'On');
+set_time_limit(600);
 
 define('OPENTSDB_HOST', '127.0.0.1');
 define('OPENTSDB_PORT', 4242);
 
+header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+header('Access-Control-Allow-Credentials: true');
 
 $json = file_get_contents('php://input');
 if (sizeof($json) == 0)
 {
   // check if this is an OPTIONS request
   if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    // Forward OPTIONS headers to Host and relay responses
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
+      header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
+      header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
   } else {
     // really?
     http_response_code(412);
@@ -47,7 +56,6 @@ $results = Array();
 if (isset($json['queries']) && is_array($json['queries']))
 {
   $headers = getallheaders();
-
   foreach ($json['queries'] as $offset=>$query)
   {
     $new_json = $json;
